@@ -10,25 +10,50 @@ const PRESET = {
     prompt:
       "Bacakan dengan gaya chibi lucu: suara agak cempreng, tempo cepat, energi tinggi, ekspresi komedi, intonasi naik-turun, artikulasi jelas. Tambahkan tawa kecil halus sesekali (tidak berlebihan).",
   },
-  normal: {
-    label: "Normal natural",
+  chibi_max: {
+    label: "Chibi SUPER (lebih heboh)",
     prompt:
-      "Bacakan natural dan ramah: tempo normal, artikulasi jelas, intonasi wajar, terdengar hangat dan santai.",
+      "Bacakan super chibi ngakak: suara lebih cempreng, tempo lebih cepat, energi sangat tinggi, banyak ekspresi, intonasi ekstrem lucu, jeda pendek, tetap jelas, boleh ada 'hehe' kecil 1-2 kali.",
+  },
+  santai: {
+    label: "Santai ngobrol",
+    prompt:
+      "Bacakan santai seperti ngobrol dengan teman: hangat, tempo sedang, natural, ada senyum di suara, tidak formal.",
+  },
+  serius: {
+    label: "Serius tegas",
+    prompt:
+      "Bacakan tegas dan serius: tempo sedang, artikulasi kuat, intonasi stabil, sedikit menekan kata kunci penting.",
   },
   narrator: {
     label: "Narator cinematic",
     prompt:
-      "Bacakan seperti narator trailer cinematic: suara tegas, dalam, dramatis tapi tetap jelas, tempo sedang, jeda yang pas di akhir kalimat penting.",
+      "Bacakan seperti narator trailer cinematic: suara tegas, dalam, dramatis tapi jelas, tempo sedang, jeda yang pas di akhir kalimat penting.",
   },
-  news: {
+  berita: {
     label: "Pembawa berita",
     prompt:
       "Bacakan seperti pembawa berita: tegas, jelas, informatif, tempo sedang, intonasi stabil, tidak berlebihan emosinya.",
+  },
+  whisper: {
+    label: "Bisik dramatis",
+    prompt:
+      "Bacakan berbisik dramatis: volume lembut, dekat mic, tempo pelan-sedang, jelas, suasana misterius tapi tidak menyeramkan.",
+  },
+  marah_lucu: {
+    label: "Marah lucu (komedi)",
+    prompt:
+      "Bacakan seperti marah tapi lucu: intonasi naik, sedikit meledak-ledak, tempo cepat-sedang, tetap komedik dan jelas.",
   },
   robot: {
     label: "Robot lucu",
     prompt:
       "Bacakan seperti robot lucu: ritme sedikit patah-patah, tetap jelas, intonasi unik dan komedik, jangan terlalu monotone.",
+  },
+  iklan: {
+    label: "Iklan/promosi",
+    prompt:
+      "Bacakan seperti voice over iklan: ceria, persuasif, tempo sedang-cepat, artikulasi tajam, terdengar menjual tapi tidak lebay.",
   },
 };
 
