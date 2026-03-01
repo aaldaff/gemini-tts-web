@@ -17,6 +17,7 @@ export default function Home() {
   const voices = useMemo(
     () => [
       { key: "Algenib", label: "Algenib" },
+      { key: "Leda", label: "Leda" },
       { key: "Kore", label: "Kore" },
       { key: "Puck", label: "Puck" },
       { key: "Zephyr", label: "Zephyr" },
