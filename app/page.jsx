@@ -3,17 +3,21 @@
 import { useMemo, useState } from "react";
 
 export default function Home() {
-  const presets = useMemo(
-    () => [
-      { key: "chibi", label: "Chibi cempreng" },
-      { key: "normal", label: "Normal" },
-      { key: "narrator", label: "Narator cinematic" },
-      { key: "news", label: "Berita" },
-      { key: "robot", label: "Robot lucu" },
-    ],
-    []
-  );
-
+const presets = useMemo(
+  () => [
+    { key: "chibi", label: "Chibi cempreng" },
+    { key: "chibi_max", label: "Chibi SUPER" },
+    { key: "santai", label: "Santai ngobrol" },
+    { key: "serius", label: "Serius tegas" },
+    { key: "narrator", label: "Narator cinematic" },
+    { key: "berita", label: "Pembawa berita" },
+    { key: "whisper", label: "Bisik dramatis" },
+    { key: "marah_lucu", label: "Marah lucu" },
+    { key: "robot", label: "Robot lucu" },
+    { key: "iklan", label: "Iklan/promosi" },
+  ],
+  []
+);
   const voices = useMemo(
     () => [
       { key: "Algenib", label: "Algenib" },
