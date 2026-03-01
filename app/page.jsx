@@ -3,21 +3,22 @@
 import { useMemo, useState } from "react";
 
 export default function Home() {
-const presets = useMemo(
-  () => [
-    { key: "chibi", label: "Chibi cempreng" },
-    { key: "chibi_max", label: "Chibi SUPER" },
-    { key: "santai", label: "Santai ngobrol" },
-    { key: "serius", label: "Serius tegas" },
-    { key: "narrator", label: "Narator cinematic" },
-    { key: "berita", label: "Pembawa berita" },
-    { key: "whisper", label: "Bisik dramatis" },
-    { key: "marah_lucu", label: "Marah lucu" },
-    { key: "robot", label: "Robot lucu" },
-    { key: "iklan", label: "Iklan/promosi" },
-  ],
-  []
-);
+  const presets = useMemo(
+    () => [
+      { key: "chibi", label: "Chibi cempreng" },
+      { key: "chibi_max", label: "Chibi SUPER" },
+      { key: "santai", label: "Santai ngobrol" },
+      { key: "serius", label: "Serius tegas" },
+      { key: "narrator", label: "Narator cinematic" },
+      { key: "berita", label: "Pembawa berita" },
+      { key: "whisper", label: "Bisik dramatis" },
+      { key: "marah_lucu", label: "Marah lucu" },
+      { key: "robot", label: "Robot lucu" },
+      { key: "iklan", label: "Iklan/promosi" },
+    ],
+    []
+  );
+
   const voices = useMemo(
     () => [
       { key: "Algenib", label: "Algenib" },
@@ -36,13 +37,13 @@ const presets = useMemo(
   const [loading, setLoading] = useState(false);
   const [audioUrl, setAudioUrl] = useState("");
 
-  async function generate(nextPreset = preset) {
+  async function generate() {
     setLoading(true);
     try {
       const r = await fetch("/api/tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, preset: nextPreset, voice }),
+        body: JSON.stringify({ text, preset, voice }),
       });
 
       if (!r.ok) throw new Error(await r.text());
@@ -56,7 +57,7 @@ const presets = useMemo(
         if (el) el.play().catch(() => {});
       }, 50);
     } catch (e) {
-      alert("Gagal: " + e.message);
+      alert("Gagal: " + (e?.message || e));
     } finally {
       setLoading(false);
     }
@@ -73,7 +74,7 @@ const presets = useMemo(
     >
       <h1 style={{ fontSize: 28, marginBottom: 6 }}>Gemini TTS Web</h1>
       <p style={{ marginTop: 0, opacity: 0.8 }}>
-        Preset suara + voice (termasuk Algenib). Jika voice tidak tersedia, otomatis fallback ke Kore.
+        Preset suara + voice (termasuk Algenib & Leda). Jika voice tidak tersedia, otomatis fallback ke Kore.
       </p>
 
       <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginTop: 14 }}>
@@ -93,15 +94,12 @@ const presets = useMemo(
         </div>
 
         <div style={{ flex: 1, minWidth: 260 }}>
-          <label style={{ display: "block", marginBottom: 6 }}>Preset cepat</label>
+          <label style={{ display: "block", marginBottom: 6 }}>Preset</label>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {presets.map((p) => (
               <button
                 key={p.key}
-                onClick={() => {
-                  setPreset(p.key);
-                  generate(p.key);
-                }}
+                onClick={() => setPreset(p.key)}   // ✅ hanya pilih preset, tidak generate
                 disabled={loading}
                 style={{
                   padding: "10px 12px",
@@ -134,7 +132,7 @@ const presets = useMemo(
 
       <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 12 }}>
         <button
-          onClick={() => generate(preset)}
+          onClick={generate}
           disabled={loading}
           style={{
             padding: "10px 14px",
