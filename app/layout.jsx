@@ -1,6 +1,6 @@
 export const metadata = {
   title: "Gemini TTS Web",
-  description: "Web TTS pakai Gemini (Google AI Studio) + preset suara",
+  description: "Web TTS pakai Gemini + preset suara",
 };
 
 export default function RootLayout({ children }) {
