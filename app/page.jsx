@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export default function Home() {
   const presets = useMemo(
@@ -22,7 +22,7 @@ export default function Home() {
   const voices = useMemo(
     () => [
       { key: "Algenib", label: "Algenib" },
-      { key: "Leda", label: "Leda" },
+      { key: "Leda", label: "LEDA" },
       { key: "Kore", label: "Kore" },
       { key: "Puck", label: "Puck" },
       { key: "Zephyr", label: "Zephyr" },
@@ -36,14 +36,34 @@ export default function Home() {
   const [voice, setVoice] = useState("Algenib");
   const [loading, setLoading] = useState(false);
   const [audioUrl, setAudioUrl] = useState("");
+  const [status, setStatus] = useState("");
+  const [cooldown, setCooldown] = useState(0);
+
+  // Countdown cooldown (anti 429 spam)
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const t = setInterval(() => setCooldown((c) => Math.max(0, c - 1)), 1000);
+    return () => clearInterval(t);
+  }, [cooldown]);
 
   async function generate() {
+    if (loading) return;
+    if (cooldown > 0) return;
+
+    const t = String(text || "").trim();
+    if (!t) {
+      setStatus("Teks masih kosong.");
+      return;
+    }
+
     setLoading(true);
+    setStatus("");
+
     try {
       const r = await fetch("/api/tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, preset, voice }),
+        body: JSON.stringify({ text: t, preset, voice }),
       });
 
       if (!r.ok) throw new Error(await r.text());
@@ -56,12 +76,29 @@ export default function Home() {
         const el = document.getElementById("player");
         if (el) el.play().catch(() => {});
       }, 50);
+
+      setStatus("Sukses! Audio sudah dibuat.");
     } catch (e) {
-      alert("Gagal: " + (e?.message || e));
+      const msg = String(e?.message || e);
+
+      // ambil detik dari pesan: "Please retry in 42.63s" atau retryDelay:"42s"
+      const m =
+        msg.match(/retry in ([0-9.]+)s/i) ||
+        msg.match(/retryDelay\\":\\"(\\d+)s\\"/i);
+      const wait = m ? Math.ceil(Number(m[1])) : 45;
+
+      if (msg.includes("429") || msg.includes("RESOURCE_EXHAUSTED")) {
+        setStatus(`Kena limit (429). Tunggu ${wait} detik lalu coba lagi.`);
+        setCooldown(wait);
+      } else {
+        setStatus("Gagal: " + msg);
+      }
     } finally {
       setLoading(false);
     }
   }
+
+  const activePresetLabel = presets.find((p) => p.key === preset)?.label ?? preset;
 
   return (
     <main
@@ -74,7 +111,7 @@ export default function Home() {
     >
       <h1 style={{ fontSize: 28, marginBottom: 6 }}>Gemini TTS Web</h1>
       <p style={{ marginTop: 0, opacity: 0.8 }}>
-        Preset suara + voice (termasuk Algenib & Leda). Jika voice tidak tersedia, otomatis fallback ke Kore.
+        Preset suara + voice (Algenib/LEDA). Jika voice tidak tersedia, backend fallback ke Kore.
       </p>
 
       <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginTop: 14 }}>
@@ -94,12 +131,15 @@ export default function Home() {
         </div>
 
         <div style={{ flex: 1, minWidth: 260 }}>
-          <label style={{ display: "block", marginBottom: 6 }}>Preset</label>
+          <label style={{ display: "block", marginBottom: 6 }}>
+            Preset (klik untuk memilih — tidak auto-generate)
+          </label>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {presets.map((p) => (
               <button
+                type="button"
                 key={p.key}
-                onClick={() => setPreset(p.key)}   // ✅ hanya pilih preset, tidak generate
+                onClick={() => setPreset(p.key)}
                 disabled={loading}
                 style={{
                   padding: "10px 12px",
@@ -130,24 +170,31 @@ export default function Home() {
         }}
       />
 
-      <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 12 }}>
+      <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 12, flexWrap: "wrap" }}>
         <button
+          type="button"
           onClick={generate}
-          disabled={loading}
+          disabled={loading || cooldown > 0}
           style={{
             padding: "10px 14px",
             borderRadius: 12,
             border: "1px solid #ddd",
-            cursor: loading ? "not-allowed" : "pointer",
+            cursor: loading || cooldown > 0 ? "not-allowed" : "pointer",
           }}
         >
-          {loading ? "Generating..." : "Generate"}
+          {loading ? "Generating..." : cooldown > 0 ? `Tunggu ${cooldown}s` : "Generate"}
         </button>
 
         <span style={{ opacity: 0.7 }}>
-          Aktif: <b>{presets.find((p) => p.key === preset)?.label}</b> • Voice: <b>{voice}</b>
+          Aktif: <b>{activePresetLabel}</b> • Voice: <b>{voice}</b>
         </span>
       </div>
+
+      {status && (
+        <p style={{ marginTop: 10, color: status.includes("Gagal") ? "#b91c1c" : "#b45309" }}>
+          {status}
+        </p>
+      )}
 
       {audioUrl && (
         <section style={{ marginTop: 18 }}>
