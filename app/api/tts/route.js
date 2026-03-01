@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
-import { pcm16ToWav } from "@/lib/wav";
+import { pcm16ToWav } from "../../../lib/wav";
 
 export const runtime = "nodejs";
 
