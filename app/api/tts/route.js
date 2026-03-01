@@ -47,29 +47,24 @@ const PRESET = {
   },
 };
 
-async function callTTS(ai, prompt, voiceName) {
-  return ai.models.generateContent({
+const callTTS = (ai, prompt, voiceName) =>
+  ai.models.generateContent({
     model: "gemini-2.5-flash-preview-tts",
     contents: [{ role: "user", parts: [{ text: prompt }] }],
     config: {
       responseModalities: ["AUDIO"],
-      speechConfig: {
-        voiceConfig: {
-          prebuiltVoiceConfig: { voiceName },
-        },
-      },
+      speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName } } },
     },
   });
-}
 
-function extractRetrySeconds(msg) {
+const extractRetrySeconds = (msg) => {
   const s = String(msg || "");
   let m = s.match(/retry in ([0-9.]+)s/i);
   if (m?.[1]) return Math.ceil(Number(m[1]));
   m = s.match(/retryDelay\\":\\"(\\d+)s\\"/i);
   if (m?.[1]) return Math.ceil(Number(m[1]));
   return null;
-}
+};
 
 export async function POST(req) {
   try {
@@ -114,10 +109,7 @@ export async function POST(req) {
 
     return new NextResponse(wav, {
       status: 200,
-      headers: {
-        "Content-Type": "audio/wav",
-        "Cache-Control": "no-store",
-      },
+      headers: { "Content-Type": "audio/wav", "Cache-Control": "no-store" },
     });
   } catch (e) {
     const msg = String(e?.message || e);
@@ -125,10 +117,9 @@ export async function POST(req) {
     const statusCode =
       msg.includes("429") || msg.includes("RESOURCE_EXHAUSTED") ? 429 : 500;
 
-    return NextResponse.json(
+      return NextResponse.json(
       { error: "TTS gagal", detail: msg, retrySeconds },
       { status: statusCode }
     );
   }
-}
 }
