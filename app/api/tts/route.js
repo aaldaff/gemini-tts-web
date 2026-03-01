@@ -122,10 +122,16 @@ export async function POST(req) {
         "X-TTS-Voice": voice,
       },
     });
-  } catch (e) {
-    return NextResponse.json(
-      { error: "TTS gagal", detail: String(e?.message || e) },
-      { status: 500 }
-    );
-  }
+ } catch (e) {
+  const msg = String(e?.message || e);
+  // coba ambil info retry dari pesan error (contoh: "Please retry in 20.04s")
+  const m = msg.match(/retry in ([0-9.]+)s/i) || msg.match(/retryDelay\\":\\"(\\d+)s\\"/i);
+  const retrySeconds = m ? Math.ceil(Number(m[1])) : null;
+
+  const statusCode = msg.includes("429") ? 429 : 500;
+
+  return NextResponse.json(
+    { error: "TTS gagal", detail: msg, retrySeconds },
+    { status: statusCode }
+  );
 }
